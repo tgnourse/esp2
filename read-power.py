@@ -1,6 +1,6 @@
 import serial
 import pprint
-
+import binascii
 
 def parse_decimal_field(data):
     return float(parse_field(data)) / 10
@@ -40,12 +40,8 @@ def parse_meter(data):
     print('length: ' + str(len(data)))
     # print(data.hex())
     return {
-        # 'model_number': struct.unpack('H', data[1:3])[0],
-        # 'version': struct.unpack('B', data[3:4])[0],
-        # 'address': struct.unpack('12s', data[4:16])[0].decode('ascii')
-        #'address': data[4:16].decode("ascii")
-        'model_number': data[1:3].hex(),
-        'version': data[3:4].hex(),
+        'model_number': binascii.hexlify(data[1:3]),
+        'version': binascii.hexlify(data[3:4]),
         'address': parse_field(data[4:16]),
         'kwh_total': parse_decimal_field(data[16:24]),
         'kwh_t1': parse_decimal_field(data[24:32]),
