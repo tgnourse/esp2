@@ -83,11 +83,11 @@ def read_meter():
 
     print("reading 000400003705")
     ser.write(b'/?000400003705!\r\n')
-    print(ser.read(255))
+    pprint.pprint(parse_meter(ser.read(255)))
 
     print("reading 000400003718")
     ser.write(b'/?000400003718!\r\n')
-    print(ser.read(255))
+    pprint.pprint(parse_meter(ser.read(255)))
 
     ser.close()
 
