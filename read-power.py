@@ -143,7 +143,7 @@ def transform_points(responses):
 def upload_data(host, port, user, password, dbname, data):
     print('Uploading this data:\n')
     pprint.pprint(data)
-    print('to ' + user + '@' + host + ':'+ port + '/' + dbname)
+    print('to ' + user + '@' + host + ':' + str(port) + '/' + dbname)
     client = InfluxDBClient(host, port, user, password, dbname, ssl=True, verify_ssl=False)
     return client.write_points(data)
 
