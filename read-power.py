@@ -2,6 +2,7 @@ import serial
 import pprint
 import binascii
 
+
 def parse_decimal_field(data):
     return float(parse_field(data)) / 10
 
@@ -32,7 +33,10 @@ def parse_field(data):
     }
     f = ''
     for b in data:
-        f = f + m[b]
+        if b in m:
+            f = f + m[b]
+        else:
+            f = f + ''
     return f
 
 
@@ -59,12 +63,30 @@ def parse_meter(data):
         'amps_l1': parse_decimal_field(data[108:112]),
         'amps_l2': parse_decimal_field(data[112:116]),
         'amps_l3': parse_decimal_field(data[116:120]),
+        'power_total': parse_decimal_field(data[120:126]),
+        'power_phase_1': parse_decimal_field(data[126:132]),
+        'power_phase_2': parse_decimal_field(data[132:138]),
+        'power_phase_3': parse_decimal_field(data[138:144]),
+        'power_factor_phase_1': parse_decimal_field(data[144:148]),
+        'power_factor_phase_2': parse_decimal_field(data[148:152]),
+        'power_factor_phase_3': parse_decimal_field(data[152:156]),
+        'demand_max': parse_decimal_field(data[156:162]),
+        'demand_period': parse_decimal_field(data[162:163]),
+        'date_year': parse_field(data[163:165]),
+        'date_month': parse_field(data[165:167]),
+        'date_day': parse_field(data[167:169]),
+        'date_day_of_week': parse_field(data[169:171]),
+        'time_hour': parse_field(data[171:173]),
+        'time_minute': parse_field(data[173:175]),
+        'time_second': parse_field(data[175:177]),
     }
 
 
 def test_parsing():
     # reading 000400003705
     meter1 = b'\x82\x90"\x17000\xb400003\xb705000\xb13\xb1\xb1\xb70000\xb80600000505\xb700000000000000000000000000000000000000000000000000000000\xb1\xb2\xb20\xb1\xb2\xb1\xb7000000000000360000000000\xb1\xb4000036\xb2000000000003\xb7\xb8\xc3099\xcc099\xc3000000\xb23\xb400\xb1\xb200\xb2030\xb2\xb1\xb209\xb2\xb10\xb2000000000000000000000000000000000000000000000000000000000000\x00!\x8d\n\x03`\xc0'
+    print(meter1)
+    print(meter1.hex())
     # reading 000400003718
     meter2 = b'\x82\x90"\x17000\xb400003\xb7\xb1\xb8000035050000\xb2\xb1\xb8\xb80000\xb13\xb1\xb700000000000000000000000000000000000000000000000000000000\xb1\xb2\xb1900000000000\xb1000000000000000\xb1\xb10000000000000000000\xb1\xb10\xc309\xb4\xc3000\xc30000000\xb2600\xb1\xb200\xb20\xb20\xb1\xb20\xb1\xb1\xb2\xb20\xb2000000000000000000000000000000000000000000000000000000000000\x00!\x8d\n\x03\x84\x81'
 
