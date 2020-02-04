@@ -117,5 +117,5 @@ def test_read_meters():
     read_meters('/dev/ttyUSB1', ['000400003705', '000400003718'])
 
 
-test_parsing()
-# test_read_meters()
+# test_parsing()
+test_read_meters()
