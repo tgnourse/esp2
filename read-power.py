@@ -87,7 +87,7 @@ def read_meters(port, ids):
     print(ser.name)
 
     for meter_id in ids:
-        print(f'reading {meter_id}')
+        print('reading' + meter_id)
         ser.write(b'/?' + meter_id.encode('ascii') + b'!\r\n')
         pprint.pprint(parse_meter(ser.read(255)))
 
