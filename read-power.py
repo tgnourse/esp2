@@ -1,6 +1,8 @@
 import serial
 import pprint
 import binascii
+from influxdb import InfluxDBClient
+import argparse
 
 
 def parse_decimal_field(data):
@@ -87,12 +89,67 @@ def read_meters(port, ids):
     ser = serial.Serial(port)
     print(ser.name)
 
+    results = []
     for meter_id in ids:
-        print('reading' + meter_id)
+        print('reading: ' + meter_id)
         ser.write(b'/?' + meter_id.encode('ascii') + b'!\r\n')
-        pprint.pprint(parse_meter(ser.read(255)))
+        results.append(parse_meter(ser.read(255)))
 
     ser.close()
+    return results
+
+
+def transform_point(response):
+    return {
+        'measurement': 'readings',
+        'tags': {
+            'address': response['address'],
+            'model_number': response['model_number'],
+            'version': response['version'],
+        },
+        'fields': {
+            'kwh_total': response['kwh_total'],
+            'kwh_t1': response['kwh_t1'],
+            'kwh_t2': response['kwh_t2'],
+            'kwh_t3': response['kwh_t3'],
+            'kwh_t4': response['kwh_t4'],
+            'kwh_total_reverse': response['kwh_total_reverse'],
+            'kwh_t1_reverse': response['kwh_t1_reverse'],
+            'kwh_t2_reverse': response['kwh_t2_reverse'],
+            'kwh_t3_reverse': response['kwh_t3_reverse'],
+            'kwh_t4_reverse': response['kwh_t4_reverse'],
+            'volts_l1_l2': response['volts_l1_l2'],
+            'volts_l2_l3': response['volts_l2_l3'],
+            'volts_l3_l1': response['volts_l3_l1'],
+            'amps_l1': response['amps_l1'],
+            'amps_l2': response['amps_l2'],
+            'amps_l3': response['amps_l3'],
+            'watts_phase_1': response['watts_phase_1'],
+            'watts_phase_2': response['watts_phase_2'],
+            'watts_phase_3': response['watts_phase_3'],
+            'watts_total': response['watts_total'],
+        }
+    }
+
+
+def transform_points(responses):
+    points = []
+    for response in responses:
+        points.append(transform_point(response))
+    return points
+
+
+def upload_data(host, port, user, password, dbname, data):
+    print('Uploading this data:\n')
+    pprint.pprint(data)
+    print(f'to {user}@{host}:{port}/{dbname}')
+    client = InfluxDBClient(host, port, user, password, dbname, ssl=True, verify_ssl=False)
+    return client.write_points(data)
+
+
+def collect_and_upload(serial_port, meters, host, port, user, password, database):
+    responses = read_meters(serial_port, meters)
+    upload_data(host, port, user, password, database, transform_points(responses))
 
 
 def test_parsing():
@@ -112,10 +169,30 @@ def test_parsing():
     pprint.pprint(parse_meter(meter2))
 
 
-def test_read_meters():
+def test_reading():
     # on mac: /dev/tty.usbserial-141320
-    read_meters('/dev/ttyUSB1', ['000400003705', '000400003718'])
+    pprint.pprint(read_meters('/dev/ttyUSB1', ['000400003705', '000400003718']))
 
 
+def test_uploading(host, port, user, password, database):
+    meter1 = b'\x82\x90"\x17000\xb400003\xb705000\xb13\xb1\xb1\xb70000\xb80600000505\xb700000000000000000000000000000000000000000000000000000000\xb1\xb2\xb20\xb1\xb2\xb1\xb7000000000000360000000000\xb1\xb4000036\xb2000000000003\xb7\xb8\xc3099\xcc099\xc3000000\xb23\xb400\xb1\xb200\xb2030\xb2\xb1\xb209\xb2\xb10\xb2000000000000000000000000000000000000000000000000000000000000\x00!\x8d\n\x03`\xc0'
+    upload_data(host, port, user, password, database, transform_points([parse_meter(meter1)]))
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--influxdb_host')
+parser.add_argument('--influxdb_port', type=int, default=8086)
+parser.add_argument('--influxdb_user')
+parser.add_argument('--influxdb_password')
+parser.add_argument('--influxdb_database')
+parser.add_argument('--serial_port', default='/dev/ttyUSB1')
+parser.add_argument('meters', nargs='+')
+args = parser.parse_args()
+
+collect_and_upload(
+    args.serial_port, args.meters,
+    args.influxdb_host, args.influxdb_port, args.influxdb_user, args.influxdb_password, args.influxdb_database)
+
+# test_uploading(args.influxdb_host, args.influxdb_port, args.influxdb_user, args.influxdb_password, args.influxdb_database)
 # test_parsing()
-test_read_meters()
+# test_reading()
