@@ -63,22 +63,23 @@ def parse_meter(data):
         'amps_l1': parse_decimal_field(data[108:112]),
         'amps_l2': parse_decimal_field(data[112:116]),
         'amps_l3': parse_decimal_field(data[116:120]),
-        'power_total': parse_decimal_field(data[120:126]),
-        'power_phase_1': parse_decimal_field(data[126:132]),
-        'power_phase_2': parse_decimal_field(data[132:138]),
-        'power_phase_3': parse_decimal_field(data[138:144]),
-        'power_factor_phase_1': parse_field(data[144:148]),
-        'power_factor_phase_2': parse_field(data[148:152]),
-        'power_factor_phase_3': parse_field(data[152:156]),
-        'demand_max': parse_field(data[156:162]),
-        'demand_period': parse_field(data[162:163]),
-        'date_year': parse_field(data[163:165]),
-        'date_month': parse_field(data[165:167]),
-        'date_day': parse_field(data[167:169]),
-        'date_day_of_week': parse_field(data[169:171]),
-        'time_hour': parse_field(data[171:173]),
-        'time_minute': parse_field(data[173:175]),
-        'time_second': parse_field(data[175:177]),
+        'watts_phase_1': parse_decimal_field(data[126:132]),
+        'watts_phase_2': parse_decimal_field(data[132:138]),
+        'watts_phase_3': parse_decimal_field(data[138:144]),
+        'watts_total': parse_decimal_field(data[120:126]),
+        # Below here's not working
+        # 'power_factor_phase_1': parse_field(data[144:148]),
+        # 'power_factor_phase_2': parse_field(data[148:152]),
+        # 'power_factor_phase_3': parse_field(data[152:156]),
+        # 'demand_max': parse_field(data[156:162]),
+        # 'demand_period': parse_field(data[162:163]),
+        # 'date_year': parse_field(data[163:165]),
+        # 'date_month': parse_field(data[165:167]),
+        # 'date_day': parse_field(data[167:169]),
+        # 'date_day_of_week': parse_field(data[169:171]),
+        # 'time_hour': parse_field(data[171:173]),
+        # 'time_minute': parse_field(data[173:175]),
+        # 'time_second': parse_field(data[175:177]),
     }
 
 
@@ -115,5 +116,6 @@ def test_read_meters():
     # on mac: /dev/tty.usbserial-141320
     read_meters('/dev/ttyUSB1', ['000400003705', '000400003718'])
 
-# test_parsing()
-test_read_meters()
+
+test_parsing()
+# test_read_meters()
