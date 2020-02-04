@@ -87,7 +87,7 @@ def read_meters(port, ids):
     print(ser.name)
 
     for meter_id in ids:
-        print(f'reading {id}')
+        print(f'reading {meter_id}')
         ser.write(b'/?' + meter_id.encode('ascii') + b'!\r\n')
         pprint.pprint(parse_meter(ser.read(255)))
 
@@ -116,4 +116,4 @@ def test_read_meters():
     read_meters('/dev/ttyUSB1', ['000400003705', '000400003718'])
 
 # test_parsing()
-read_meter()
+test_read_meters()
