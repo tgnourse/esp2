@@ -44,7 +44,7 @@ def parse_field(data):
 
 def parse_meter(data):
     print('length: ' + str(len(data)))
-    # print(data.hex())
+    print(data.hex())
     return {
         'model_number': binascii.hexlify(data[1:3]),
         'version': binascii.hexlify(data[3:4]),
