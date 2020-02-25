@@ -87,7 +87,7 @@ def parse_meter(data):
 
 
 def read_meters(port, ids):
-    ser = serial.Serial(port)
+    ser = serial.Serial(port, timeout=5)
     print(ser.name)
 
     results = []
