@@ -38,13 +38,13 @@ def parse_field(data):
         if b in m:
             f = f + m[b]
         else:
-            f = f + '#'
+            f = f + '0'
     return f
 
 
 def parse_meter(data):
     print('length: ' + str(len(data)))
-    print(data.hex())
+    # print(data.hex())
     return {
         'model_number': binascii.hexlify(data[1:3]),
         'version': binascii.hexlify(data[3:4]),
